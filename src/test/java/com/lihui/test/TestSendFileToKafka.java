@@ -1,6 +1,9 @@
 package com.lihui.test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.alibaba.fastjson.JSON;
 import com.lihui.cms.domain.enums.ContentType;
 import com.lihui.domain.Article;
+import com.lihui.utils.RandomUtil;
 import com.lihui.utils.StreamUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -36,12 +40,24 @@ public class TestSendFileToKafka {
 			article.setChannel_id(1);
 			article.setCategory_id(1);
 			article.setUser_id(125);
-			article.setPicture("51bf8b8a-0640-4430-9b3a-dcac7271e8ff.jpg");
+			List<String> imgNameList=new ArrayList<String>();
+			File imgFile = new File("e:/pic/");
+			File[] imgList = imgFile.listFiles();
+			for (File file3 : imgList) {
+				String imgName = file3.getName();
+				if(imgName.endsWith(".jpg") || imgName.endsWith(".png") || imgName.endsWith(".jpeg")) {
+					imgNameList.add(imgName);
+				}
+			}
+			String img = imgNameList.get(RandomUtil.getRandomNum(imgNameList.size()-1, 0));
+			article.setPicture(img);
 			article.setContent_type(ContentType.HTML);
 			String jsonString = JSON.toJSONString(article);
 			kafkaTemplate.send("article", jsonString);
 			
 		}
 	}
+	
+	
 	
 }
